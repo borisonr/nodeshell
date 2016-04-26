@@ -31,6 +31,28 @@ module.exports = {
       prompt();
     })
   },
+  wc: function (file) {
+    fs.readFile(file, function(err, data){
+      if (err) throw err;
+        process.stdout.write(       data.toString().split('\n').length
+ + "\n");
+      prompt();
+    })
+  },
+
+  uniq: function(file){
+    fs.readFile(file, function(err, data){
+      if (err) throw err;
+      var output = data.toString().split('\n');
+      process.stdout.write(output[0] + '\n');
+      for(var i = 1; i < output.length; i++){
+          if(output[i] != output[i-1]){
+            process.stdout.write(output[i] + '\n');
+          }
+      }
+      prompt();
+    });
+  },
 
   date: function(file){
     process.stdout.write(new Date().toString()+ '\n');
