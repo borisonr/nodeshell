@@ -9,8 +9,12 @@ process.stdin.on('data', function (data) {
   // console.log(cmd);
   var args = data.toString().substring(data.indexOf(' ')+1).trim();
 
+  var done = function(output){
+    process.stdout.write(output);
+    process.stdout.write('prompt > ');
+  };
   // var cmd = data.toString().trim(); // remove the newline
-  commands[cmd](args);
+  commands[cmd](args, done);
   // process.stdout.write(commands[cmd]());
 
 });
