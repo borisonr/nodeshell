@@ -1,56 +1,73 @@
 var fs = require('fs');
-var prompt = function(){
-  return process.stdout.write('prompt > ');
+var request = require('request');
+
+
+var print= function (message) {
+    process.stdout.write(message);
+    process.stdout.write('prompt > ');
 }
 
+
+
 module.exports = {
-  echo: function(file){
+  echo: function(file, done){
+    var output = "";
     if(file[0] === '$'){
       var newFile = file.substr(1);
-      process.stdout.write(process.env[newFile] + '\n');
+      output+=process.env[newFile] + '\n';
 
     }
     else{
-      process.stdout.write(file + '\n');
+      output+= file + '\n';
     }
-    prompt();
+    done(output);
   },
-  pwd: function(file){
-    process.stdout.write(process.cwd() +'\n');
-    prompt();
+  pwd: function(file, done){
+    done(process.cwd() +'\n');
 
   },
-  sort: function (file) {
+  curl:function(url, done){
+
+    request(url, function (error, response, body) {
+      if (!error && response.statusCode == 200) {
+      //  console.log(body);
+         done(body+'\n') // Show the HTML for the Google homepage.
+       }
+
+    })
+
+  },
+  sort: function (file, done) {
     fs.readFile(file, function(err, data){
+      var output = "";
       if (err) throw err;
-      var output = data.toString().split('\n').sort();
-      output.forEach(function (line) {
-        process.stdout.write(line.toString() + "\n");
+      var lines = data.toString().split('\n').sort();
+      lines.forEach(function (line) {
+        output+=line.toString() + "\n";
       })
 
-      prompt();
+    done(output)
     })
   },
-  wc: function (file) {
+  wc: function (file, done) {
     fs.readFile(file, function(err, data){
       if (err) throw err;
-        process.stdout.write(       data.toString().split('\n').length
+        done(data.toString().split('\n').length
  + "\n");
-      prompt();
     })
   },
 
-  uniq: function(file){
+  uniq: function(file, done){
     fs.readFile(file, function(err, data){
       if (err) throw err;
-      var output = data.toString().split('\n');
-      process.stdout.write(output[0] + '\n');
-      for(var i = 1; i < output.length; i++){
-          if(output[i] != output[i-1]){
-            process.stdout.write(output[i] + '\n');
+      var lines = data.toString().split('\n');
+      var output = lines[0] + '\n';
+      for(var i = 1; i < lines.length; i++){
+          if(lines[i] != lines[i-1]){
+            output += lines[i] + '\n';
           }
       }
-      prompt();
+      done(output);
     });
   },
 
