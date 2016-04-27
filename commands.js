@@ -10,7 +10,8 @@ var print= function (message) {
 
 
 module.exports = {
-  echo: function(file, done){
+
+  echo: function(stdin,file, done){
     var output = "";
     if(file[0] === '$'){
       var newFile = file.substr(1);
@@ -18,15 +19,15 @@ module.exports = {
 
     }
     else{
-      output+= file + '\n';
+      output+= file + '\n'||stdin+ '\n';
     }
     done(output);
   },
-  pwd: function(file, done){
+  pwd: function(stdin,file, done){
     done(process.cwd() +'\n');
 
   },
-  curl:function(url, done){
+  curl:function(stdin, url, done){
 
     request(url, function (error, response, body) {
       if (!error && response.statusCode == 200) {
@@ -37,7 +38,7 @@ module.exports = {
     })
 
   },
-  sort: function (file, done) {
+  sort: function (stdin,file, done) {
     fs.readFile(file, function(err, data){
       var output = "";
       if (err) throw err;
@@ -49,7 +50,7 @@ module.exports = {
     done(output)
     })
   },
-  wc: function (file, done) {
+  wc: function (stdin,file, done) {
     fs.readFile(file, function(err, data){
       if (err) throw err;
         done(data.toString().split('\n').length
@@ -57,7 +58,7 @@ module.exports = {
     })
   },
 
-  uniq: function(file, done){
+  uniq: function(stdin,file, done){
     fs.readFile(file, function(err, data){
       if (err) throw err;
       var lines = data.toString().split('\n');
@@ -71,48 +72,52 @@ module.exports = {
     });
   },
 
-  date: function(file){
-    process.stdout.write(new Date().toString()+ '\n');
-    prompt();
+  date: function(stdin,file, done){
+    done( new Date().toString()+ '\n');
+
 
   },
-  cat: function(file){
+  cat: function(stdin,file, done){
+    var output= "";
     fs.readFile(file, function(err, data){
       if (err) throw err;
-      process.stdout.write(data);
-      prompt();
+      output = data;
+      done(output);
     })
   },
-  head: function(file){
+  head: function(stdin,file, done){
     fs.readFile(file, function(err, data){
+      var output= "";
       if (err) throw err;
-      var output = data.toString().split('\n').slice(0,5)
-      output.forEach(function (line) {
-        process.stdout.write(line.toString() + "\n");
+      var lines = data.toString().split('\n').slice(0,5)
+      lines.forEach(function (line) {
+        output+=line.toString() + "\n";
       })
 
-      prompt();
+      done(output);
     })
   },
-  tail: function(file){
+  tail: function(stdin,file, done){
     fs.readFile(file, function(err, data){
+      var output= "";
       if (err) throw err;
-      var output = data.toString().split('\n').slice(-5)
-      output.forEach(function (line) {
-        process.stdout.write(line.toString() + "\n");
+      var lines = data.toString().split('\n').slice(-5)
+      lines.forEach(function (line) {
+        output+=line.toString() + "\n";
       })
 
-      prompt();
+      done(output);
     })
   },
 
-  ls: function(file){
+  ls: function(stdin,file, done){
     fs.readdir('.', function(err, files) {
+      var output= "";
       if (err) throw err;
       files.forEach(function(file) {
-        process.stdout.write(file.toString() + "\n");
+        output+=file.toString() + "\n";
       })
-      prompt();
+      done(output);
     });
   }
 };
