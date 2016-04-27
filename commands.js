@@ -10,8 +10,8 @@ var print= function (message) {
 
 
 module.exports = {
-  output: "",
-  echo: function(file, done){
+
+  echo: function(stdin,file, done){
     var output = "";
     if(file[0] === '$'){
       var newFile = file.substr(1);
@@ -19,15 +19,15 @@ module.exports = {
 
     }
     else{
-      output+= file + '\n';
+      output+= file + '\n'||stdin+ '\n';
     }
     done(output);
   },
-  pwd: function(file, done){
+  pwd: function(stdin,file, done){
     done(process.cwd() +'\n');
 
   },
-  curl:function(url, done){
+  curl:function(stdin, url, done){
 
     request(url, function (error, response, body) {
       if (!error && response.statusCode == 200) {
@@ -38,7 +38,7 @@ module.exports = {
     })
 
   },
-  sort: function (file, done) {
+  sort: function (stdin,file, done) {
     fs.readFile(file, function(err, data){
       var output = "";
       if (err) throw err;
@@ -50,7 +50,7 @@ module.exports = {
     done(output)
     })
   },
-  wc: function (file, done) {
+  wc: function (stdin,file, done) {
     fs.readFile(file, function(err, data){
       if (err) throw err;
         done(data.toString().split('\n').length
@@ -58,7 +58,7 @@ module.exports = {
     })
   },
 
-  uniq: function(file, done){
+  uniq: function(stdin,file, done){
     fs.readFile(file, function(err, data){
       if (err) throw err;
       var lines = data.toString().split('\n');
@@ -72,20 +72,22 @@ module.exports = {
     });
   },
 
-  date: function(file, done){
-    output = new Date().toString()+ '\n';
-    done(output);
+  date: function(stdin,file, done){
+    done( new Date().toString()+ '\n');
+
 
   },
-  cat: function(file, done){
+  cat: function(stdin,file, done){
+    var output= "";
     fs.readFile(file, function(err, data){
       if (err) throw err;
       output = data;
       done(output);
     })
   },
-  head: function(file, done){
+  head: function(stdin,file, done){
     fs.readFile(file, function(err, data){
+      var output= "";
       if (err) throw err;
       var lines = data.toString().split('\n').slice(0,5)
       lines.forEach(function (line) {
@@ -95,8 +97,9 @@ module.exports = {
       done(output);
     })
   },
-  tail: function(file, done){
+  tail: function(stdin,file, done){
     fs.readFile(file, function(err, data){
+      var output= "";
       if (err) throw err;
       var lines = data.toString().split('\n').slice(-5)
       lines.forEach(function (line) {
@@ -107,8 +110,9 @@ module.exports = {
     })
   },
 
-  ls: function(file, done){
+  ls: function(stdin,file, done){
     fs.readdir('.', function(err, files) {
+      var output= "";
       if (err) throw err;
       files.forEach(function(file) {
         output+=file.toString() + "\n";
